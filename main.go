@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/fahmialfareza/dzikir-app-api/config"
 	"github.com/fahmialfareza/dzikir-app-api/controller"
 	"github.com/fahmialfareza/dzikir-app-api/entity"
@@ -27,5 +29,11 @@ func main() {
 		salatTimeRoutes.GET("/schedule/:cityId/:year/:month/:date", salatTimeController.Schedule)
 	}
 
-	r.Run(":3000")
+	if os.Getenv("PORT") != "" {
+		// Heroku add a env variable called PORT, if exist we will use it
+		r.Run("0.0.0.0:" + os.Getenv("PORT"))
+	} else {
+		// If is running on localhost (our computer), no PORT env variable
+		r.Run("0.0.0.0:3000")
+	}
 }
