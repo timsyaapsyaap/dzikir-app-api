@@ -3,7 +3,7 @@ name: Deploy to Heroku
 on:
   push:
     branches:
-      - main
+      - staging
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME_STAGING}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
           docker_build_args: |
