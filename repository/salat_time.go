@@ -2,8 +2,9 @@ package repository
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/fahmialfareza/dzikir-app-api/entity"
 	"github.com/fahmialfareza/dzikir-app-api/helper"
@@ -27,8 +28,11 @@ func NewSalatRepository(api *entity.Config) SalatTimeRepository {
 }
 
 func (repository *salatTimeRepository) FindCity(city string) ([]entity.SalatTimeCity, error) {
-	var dataResponse entity.SalatTimeCityFindRestAPIResponse
-	var data []entity.SalatTimeCity
+	var (
+		dataResponse entity.SalatTimeCityFindRestAPIResponse
+		data         []entity.SalatTimeCity
+		wg           sync.WaitGroup
+	)
 
 	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + findCityAddress + city)
 	if err != nil {
@@ -40,24 +44,32 @@ func (repository *salatTimeRepository) FindCity(city string) ([]entity.SalatTime
 		return nil, err
 	}
 
+	wg.Add(len(dataResponse.Data))
 	for _, v := range dataResponse.Data {
-		idNumber, err := strconv.Atoi(v.ID)
-		if err != nil {
-			return data, err
-		}
+		go func(value entity.SalatTimeCityRestAPI) {
+			defer wg.Done()
 
-		data = append(data, entity.SalatTimeCity{
-			ID:   idNumber,
-			City: v.City,
-		})
+			idNumber, err := strconv.Atoi(value.ID)
+			if err != nil {
+				panic(err)
+			}
+
+			data = append(data, entity.SalatTimeCity{
+				ID:   idNumber,
+				City: value.City,
+			})
+		}(v)
 	}
+	wg.Wait()
 
 	return data, nil
 }
 
 func (repository *salatTimeRepository) CityDetails(id string) (entity.SalatTimeCity, error) {
-	var dataResponse entity.SalatTimeCityDetailsRestAPIResponse
-	var data entity.SalatTimeCity
+	var (
+		dataResponse entity.SalatTimeCityDetailsRestAPIResponse
+		data         entity.SalatTimeCity
+	)
 
 	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + cityDetails + id)
 	if err != nil {
@@ -83,8 +95,11 @@ func (repository *salatTimeRepository) CityDetails(id string) (entity.SalatTimeC
 }
 
 func (repository *salatTimeRepository) AllCities() ([]entity.SalatTimeCity, error) {
-	var dataResponse []entity.SalatTimeCityRestAPI
-	var data []entity.SalatTimeCity
+	var (
+		dataResponse []entity.SalatTimeCityRestAPI
+		data         []entity.SalatTimeCity
+		wg           sync.WaitGroup
+	)
 
 	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + allCities)
 	if err != nil {
@@ -96,26 +111,35 @@ func (repository *salatTimeRepository) AllCities() ([]entity.SalatTimeCity, erro
 		return data, err
 	}
 
+	wg.Add(len(dataResponse))
 	for _, v := range dataResponse {
-		idNumber, err := strconv.Atoi(v.ID)
-		if err != nil {
-			return data, err
-		}
+		go func(value entity.SalatTimeCityRestAPI) {
+			defer wg.Done()
 
-		data = append(data, entity.SalatTimeCity{
-			ID:   idNumber,
-			City: v.City,
-		})
+			idNumber, err := strconv.Atoi(value.ID)
+			if err != nil {
+				panic(err)
+			}
+
+			data = append(data, entity.SalatTimeCity{
+				ID:   idNumber,
+				City: value.City,
+			})
+		}(v)
+
 	}
+	wg.Wait()
 
 	return data, nil
 }
 
 func (repository *salatTimeRepository) Schedule(cityId int, year int, month int, date int) (entity.SalatTime, error) {
-	var dataResponse entity.SalatTimeRestAPIResponse
-	var data entity.SalatTime
+	var (
+		dataResponse entity.SalatTimeRestAPIResponse
+		data         entity.SalatTime
+	)
 
-	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + fmt.Sprintf("/v1/sholat/jadwal/%v/%v/%v/%v", cityId, year, month, date))
+	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + schedule(cityId, year, month, date))
 	if err != nil {
 		return data, err
 	}
@@ -126,6 +150,11 @@ func (repository *salatTimeRepository) Schedule(cityId int, year int, month int,
 	}
 
 	id, err := strconv.Atoi(dataResponse.Data.ID)
+	if err != nil {
+		return data, err
+	}
+
+	scheduleDate, err := time.Parse("2006-01-02", dataResponse.Data.Schedule.Date)
 	if err != nil {
 		return data, err
 	}
@@ -142,10 +171,11 @@ func (repository *salatTimeRepository) Schedule(cityId int, year int, month int,
 		},
 		Schedule: entity.SalatTimeSchedule{
 			FullDate: dataResponse.Data.Schedule.FullDate,
-			Date:     dataResponse.Data.Schedule.Date,
+			Date:     scheduleDate.Format("02-01-2006"),
 			Imsak:    dataResponse.Data.Schedule.Imsak,
 			Fajr:     dataResponse.Data.Schedule.Fajr,
 			Rise:     dataResponse.Data.Schedule.Rise,
+			Duha:     dataResponse.Data.Schedule.Duha,
 			Dhuhr:    dataResponse.Data.Schedule.Dhuhr,
 			Asr:      dataResponse.Data.Schedule.Asr,
 			Maghrib:  dataResponse.Data.Schedule.Maghrib,
