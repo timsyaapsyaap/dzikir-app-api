@@ -6,6 +6,10 @@ type ChaptersRestAPI struct {
 	Chapters []Chapter `json:"chapters"`
 }
 
+type ChapterRestAPI struct {
+	Chapter Chapter `json:"chapter"`
+}
+
 // Verses lists from Rest API
 type VersesRestAPI struct {
 	Verses []Verse `json:"verses"`
