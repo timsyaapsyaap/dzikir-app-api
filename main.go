@@ -14,8 +14,11 @@ import (
 var (
 	environment         *entity.Config                 = config.SetupEnvironment()
 	salatTimeRepository repository.SalatTimeRepository = repository.NewSalatRepository(environment)
+	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment)
 	salatTimeService    service.SalatTimeService       = service.NewSalatTimeService(salatTimeRepository)
+	quranService        service.QuranService           = service.NewQuranService(quranRepository)
 	salatTimeController controller.SalatTimeController = controller.NewSalatTimeController(salatTimeService)
+	quranController     controller.QuranController     = controller.NewQuranController(quranService)
 )
 
 func main() {
@@ -27,6 +30,12 @@ func main() {
 		salatTimeRoutes.GET("/cities/:id", salatTimeController.CityDetails)
 		salatTimeRoutes.GET("/cities/find/:city", salatTimeController.FindCity)
 		salatTimeRoutes.GET("/schedule/:cityId/:year/:month/:date", salatTimeController.Schedule)
+	}
+
+	quranRoutes := r.Group("/api/v1/quran")
+	{
+		quranRoutes.GET("/chapters", quranController.AllChapters)
+		quranRoutes.GET("/verses/:chapter", quranController.VersesByChapter)
 	}
 
 	if os.Getenv("PORT") != "" {
