@@ -25,5 +25,10 @@ func (service *quranService) AllChapters() ([]entity.Chapter, error) {
 }
 
 func (service *quranService) VersesByChapter(chapter int) ([]entity.Verse, error) {
-	return service.quranRepository.VersesByChapter(chapter)
+	chapterDetails, err := service.quranRepository.GetChapter(chapter)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.quranRepository.VersesByChapter(chapter, chapterDetails.VersesCount)
 }
