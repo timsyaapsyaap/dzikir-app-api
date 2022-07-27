@@ -9,14 +9,16 @@ import (
 	"github.com/fahmialfareza/dzikir-app-api/repository"
 	"github.com/fahmialfareza/dzikir-app-api/service"
 	"github.com/gin-gonic/gin"
+	"github.com/gomodule/redigo/redis"
 )
 
 var (
 	environment         *entity.Config                 = config.SetupEnvironment()
+	pool                *redis.Pool                    = config.NewPool(*environment)
 	salatTimeRepository repository.SalatTimeRepository = repository.NewSalatRepository(environment)
-	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment)
+	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment, pool)
 	salatTimeService    service.SalatTimeService       = service.NewSalatTimeService(salatTimeRepository)
-	quranService        service.QuranService           = service.NewQuranService(quranRepository)
+	quranService        service.QuranService           = service.NewQuranService(quranRepository, pool)
 	salatTimeController controller.SalatTimeController = controller.NewSalatTimeController(salatTimeService)
 	quranController     controller.QuranController     = controller.NewQuranController(quranService)
 )
@@ -35,6 +37,7 @@ func main() {
 	quranRoutes := r.Group("/api/v1/quran")
 	{
 		quranRoutes.GET("/chapters", quranController.AllChapters)
+		quranRoutes.GET("/verses", quranController.AllVerses)
 		quranRoutes.GET("/verses/:chapter", quranController.VersesByChapter)
 	}
 
