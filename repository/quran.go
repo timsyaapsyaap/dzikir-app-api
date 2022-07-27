@@ -2,24 +2,29 @@ package repository
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/fahmialfareza/dzikir-app-api/entity"
 	"github.com/fahmialfareza/dzikir-app-api/helper"
+	"github.com/gomodule/redigo/redis"
 )
 
 type QuranRepository interface {
 	AllChapters() ([]entity.Chapter, error)
 	VersesByChapter(chapter int, perPage int) ([]entity.Verse, error)
+	VersesByChapterRedis(chapter int) ([]entity.Verse, error)
 	GetChapter(chapter int) (entity.Chapter, error)
 }
 
 type quranRepository struct {
-	api *entity.Config
+	api   *entity.Config
+	redis *redis.Pool
 }
 
-func NewQuranRepository(api *entity.Config) QuranRepository {
+func NewQuranRepository(api *entity.Config, redis *redis.Pool) QuranRepository {
 	return &quranRepository{
-		api: api,
+		api:   api,
+		redis: redis,
 	}
 }
 
@@ -59,6 +64,28 @@ func (repository *quranRepository) VersesByChapter(chapter int, perPage int) ([]
 	}
 
 	return dataResponse.Verses, nil
+}
+
+func (repository *quranRepository) VersesByChapterRedis(chapter int) ([]entity.Verse, error) {
+	var (
+		data     []entity.Verse
+		verseKey = "verse:" + fmt.Sprint(chapter)
+	)
+
+	// Get verse from redis
+	client := repository.redis.Get()
+	defer client.Close()
+
+	verse, err := client.Do("GET", verseKey)
+	if err != nil {
+		return nil, err
+	} else if verse == nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(verse.([]byte), &data)
+
+	return data, err
 }
 
 func (repository *quranRepository) GetChapter(chapter int) (entity.Chapter, error) {

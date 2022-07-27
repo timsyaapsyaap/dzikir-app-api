@@ -16,6 +16,9 @@ jobs:
       - run: echo "QURAN_REST_API"=$QURAN_REST_API >> .env
         env:
           QURAN_REST_API: ${{ secrets.QURAN_REST_API }}
+      - run: echo "REDIS_URL"=$REDIS_URL >> .env
+        env:
+          REDIS_URL: ${{ secrets.REDIS_URL_PRODUCTION }}
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -25,6 +28,8 @@ jobs:
           docker_build_args: |
             SALAT_TIME_REST_API
             QURAN_REST_API
+            REDIS_URL
         env:
           SALAT_TIME_REST_API: ${{ secrets.SALAT_TIME_REST_API }}
           QURAN_REST_API: ${{ secrets.QURAN_REST_API }}
+          REDIS_URL: ${{ secrets.REDIS_URL_PRODUCTION }}
