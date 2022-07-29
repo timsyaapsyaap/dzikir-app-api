@@ -78,7 +78,7 @@ type SalatTimeSchedule struct {
 	Dhuhr   string `json:"Dzuhur"`
 	Asr     string `json:"Ashar"`
 	Maghrib string `json:"Maghrib"`
-	Isha    string `json:"Isya'"`
+	Isha    string `json:"Isya"`
 }
 
 // SalatTimeCity represents a city of salat time.
