@@ -17,10 +17,13 @@ var (
 	pool                *redis.Pool                    = config.NewPool(*environment)
 	salatTimeRepository repository.SalatTimeRepository = repository.NewSalatRepository(environment)
 	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment, pool)
+	hijriRepository     repository.HijriRepository     = repository.NewHijriRepository(environment)
 	salatTimeService    service.SalatTimeService       = service.NewSalatTimeService(salatTimeRepository)
 	quranService        service.QuranService           = service.NewQuranService(quranRepository, pool)
+	hijriService        service.HijriService           = service.NewHijriService(hijriRepository)
 	salatTimeController controller.SalatTimeController = controller.NewSalatTimeController(salatTimeService)
 	quranController     controller.QuranController     = controller.NewQuranController(quranService)
+	hijriController     controller.HijriController     = controller.NewHijriController(hijriService)
 )
 
 func main() {
@@ -39,6 +42,11 @@ func main() {
 		quranRoutes.GET("/chapters", quranController.AllChapters)
 		quranRoutes.GET("/verses", quranController.AllVerses)
 		quranRoutes.GET("/verses/:chapter", quranController.VersesByChapter)
+	}
+
+	hijriRoutes := r.Group("/api/v1/hijri")
+	{
+		hijriRoutes.GET("/:date/:month/:year", hijriController.GregorianToHijri)
 	}
 
 	if os.Getenv("PORT") != "" {

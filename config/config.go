@@ -19,11 +19,13 @@ func SetupEnvironment() *entity.Config {
 	// Set environment variables
 	salatTimeRestApi := os.Getenv("SALAT_TIME_REST_API")
 	quranRestApi := os.Getenv("QURAN_REST_API")
+	hijriRestApi := os.Getenv("HIJRI_REST_API")
 	redisUrl := os.Getenv("REDIS_URL")
 
 	return &entity.Config{
 		SalatTimeRestApi: salatTimeRestApi,
 		QuranRestApi:     quranRestApi,
+		HijriRestApi:     hijriRestApi,
 		RedisURL:         redisUrl,
 	}
 }

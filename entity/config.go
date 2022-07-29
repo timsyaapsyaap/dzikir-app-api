@@ -4,5 +4,6 @@ package entity
 type Config struct {
 	SalatTimeRestApi string `env:"SALAT_TIME_REST_API"`
 	QuranRestApi     string `env:"QURAN_REST_API"`
+	HijriRestApi     string `env:"HIJRI_REST_API"`
 	RedisURL         string `env:"REDIS_URL"`
 }
