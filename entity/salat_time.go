@@ -71,16 +71,14 @@ type SalatTimeCoordinate struct {
 }
 
 type SalatTimeSchedule struct {
-	FullDate string `json:"full_date"`
-	Imsak    string `json:"imsak"`
-	Fajr     string `json:"fajr"`
-	Rise     string `json:"rise"`
-	Duha     string `json:"duha"`
-	Dhuhr    string `json:"dhuhr"`
-	Asr      string `json:"asr"`
-	Maghrib  string `json:"maghrib"`
-	Isha     string `json:"isha"`
-	Date     string `json:"date"`
+	Imsak   string `json:"Imsak"`
+	Fajr    string `json:"Subuh"`
+	Rise    string `json:"Terbit"`
+	Duha    string `json:"Duha"`
+	Dhuhr   string `json:"Dzuhur"`
+	Asr     string `json:"Ashar"`
+	Maghrib string `json:"Maghrib"`
+	Isha    string `json:"Isya'"`
 }
 
 // SalatTimeCity represents a city of salat time.

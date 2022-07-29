@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/fahmialfareza/dzikir-app-api/entity"
 	"github.com/fahmialfareza/dzikir-app-api/helper"
@@ -154,11 +153,6 @@ func (repository *salatTimeRepository) Schedule(cityId int, year int, month int,
 		return data, err
 	}
 
-	scheduleDate, err := time.Parse("2006-01-02", dataResponse.Data.Schedule.Date)
-	if err != nil {
-		return data, err
-	}
-
 	data = entity.SalatTime{
 		ID:       id,
 		City:     dataResponse.Data.City,
@@ -170,16 +164,14 @@ func (repository *salatTimeRepository) Schedule(cityId int, year int, month int,
 			Longitude: dataResponse.Data.Coordinate.Longitude,
 		},
 		Schedule: entity.SalatTimeSchedule{
-			FullDate: dataResponse.Data.Schedule.FullDate,
-			Date:     scheduleDate.Format("02-01-2006"),
-			Imsak:    dataResponse.Data.Schedule.Imsak,
-			Fajr:     dataResponse.Data.Schedule.Fajr,
-			Rise:     dataResponse.Data.Schedule.Rise,
-			Duha:     dataResponse.Data.Schedule.Duha,
-			Dhuhr:    dataResponse.Data.Schedule.Dhuhr,
-			Asr:      dataResponse.Data.Schedule.Asr,
-			Maghrib:  dataResponse.Data.Schedule.Maghrib,
-			Isha:     dataResponse.Data.Schedule.Isha,
+			Imsak:   dataResponse.Data.Schedule.Imsak,
+			Fajr:    dataResponse.Data.Schedule.Fajr,
+			Rise:    dataResponse.Data.Schedule.Rise,
+			Duha:    dataResponse.Data.Schedule.Duha,
+			Dhuhr:   dataResponse.Data.Schedule.Dhuhr,
+			Asr:     dataResponse.Data.Schedule.Asr,
+			Maghrib: dataResponse.Data.Schedule.Maghrib,
+			Isha:    dataResponse.Data.Schedule.Isha,
 		},
 	}
 
