@@ -75,13 +75,17 @@ func (service *quranService) VersesByChapter(chapter int) ([]entity.Verse, error
 }
 
 func (service *quranService) AllVerses() (map[int][]entity.Verse, error) {
-	var wg sync.WaitGroup
+	var (
+		wg    sync.WaitGroup
+		mutex sync.Mutex
+	)
 
 	data := make(map[int][]entity.Verse)
 
 	wg.Add(114)
 	for i := 1; i <= 114; i++ {
 		go func(i int) {
+			defer mutex.Unlock()
 			defer wg.Done()
 
 			chapterDetails, err := service.quranRepository.GetChapter(i)
@@ -94,6 +98,7 @@ func (service *quranService) AllVerses() (map[int][]entity.Verse, error) {
 				fmt.Println(err)
 			}
 
+			mutex.Lock()
 			data[i] = versesDetails
 		}(i)
 	}
