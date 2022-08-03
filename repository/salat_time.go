@@ -31,6 +31,7 @@ func (repository *salatTimeRepository) FindCity(city string) ([]entity.SalatTime
 		dataResponse entity.SalatTimeCityFindRestAPIResponse
 		data         []entity.SalatTimeCity
 		wg           sync.WaitGroup
+		mutex        sync.Mutex
 	)
 
 	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + findCityAddress + city)
@@ -46,6 +47,7 @@ func (repository *salatTimeRepository) FindCity(city string) ([]entity.SalatTime
 	wg.Add(len(dataResponse.Data))
 	for _, v := range dataResponse.Data {
 		go func(value entity.SalatTimeCityRestAPI) {
+			defer mutex.Unlock()
 			defer wg.Done()
 
 			idNumber, err := strconv.Atoi(value.ID)
@@ -53,6 +55,7 @@ func (repository *salatTimeRepository) FindCity(city string) ([]entity.SalatTime
 				panic(err)
 			}
 
+			mutex.Lock()
 			data = append(data, entity.SalatTimeCity{
 				ID:   idNumber,
 				City: value.City,
@@ -98,6 +101,7 @@ func (repository *salatTimeRepository) AllCities() ([]entity.SalatTimeCity, erro
 		dataResponse []entity.SalatTimeCityRestAPI
 		data         []entity.SalatTimeCity
 		wg           sync.WaitGroup
+		mutex        sync.Mutex
 	)
 
 	body, err := helper.GetRequest(repository.api.SalatTimeRestApi + allCities)
@@ -113,6 +117,7 @@ func (repository *salatTimeRepository) AllCities() ([]entity.SalatTimeCity, erro
 	wg.Add(len(dataResponse))
 	for _, v := range dataResponse {
 		go func(value entity.SalatTimeCityRestAPI) {
+			defer mutex.Unlock()
 			defer wg.Done()
 
 			idNumber, err := strconv.Atoi(value.ID)
@@ -120,6 +125,7 @@ func (repository *salatTimeRepository) AllCities() ([]entity.SalatTimeCity, erro
 				panic(err)
 			}
 
+			mutex.Lock()
 			data = append(data, entity.SalatTimeCity{
 				ID:   idNumber,
 				City: value.City,
