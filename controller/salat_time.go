@@ -26,9 +26,17 @@ func NewSalatTimeController(salatTimeService service.SalatTimeService) SalatTime
 }
 
 func (controller *salatTimeController) FindCity(context *gin.Context) {
-	data, err := controller.salatTimeService.FindCity(context.Param("city"))
+	city := context.Param("city")
+	if city == "" {
+		res := helper.BuildErrorResponse("Bad Request", "City is required", nil)
+		context.JSON(400, res)
+		return
+	}
+
+	data, err := controller.salatTimeService.FindCity(city)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 
@@ -37,9 +45,18 @@ func (controller *salatTimeController) FindCity(context *gin.Context) {
 }
 
 func (controller *salatTimeController) CityDetails(context *gin.Context) {
-	data, err := controller.salatTimeService.CityDetails(context.Param("id"))
+	id := context.Param("id")
+
+	if id == "" {
+		res := helper.BuildErrorResponse("Bad Request", "City ID is required", nil)
+		context.JSON(400, res)
+		return
+	}
+
+	data, err := controller.salatTimeService.CityDetails(id)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 
@@ -50,7 +67,8 @@ func (controller *salatTimeController) CityDetails(context *gin.Context) {
 func (controller *salatTimeController) AllCities(context *gin.Context) {
 	data, err := controller.salatTimeService.AllCities()
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 
@@ -61,31 +79,36 @@ func (controller *salatTimeController) AllCities(context *gin.Context) {
 func (controller *salatTimeController) Schedule(context *gin.Context) {
 	cityId, err := strconv.Atoi(context.Param("cityId"))
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "City ID is required or not valid", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	year, err := strconv.Atoi(context.Param("year"))
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Year is required or not valid", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	month, err := strconv.Atoi(context.Param("month"))
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Month is required or not valid", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	date, err := strconv.Atoi(context.Param("date"))
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Date is required or not valid", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	data, err := controller.salatTimeService.Schedule(cityId, year, month, date)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 

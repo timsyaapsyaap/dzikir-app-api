@@ -6,6 +6,7 @@ import (
 	"github.com/fahmialfareza/dzikir-app-api/config"
 	"github.com/fahmialfareza/dzikir-app-api/controller"
 	"github.com/fahmialfareza/dzikir-app-api/entity"
+	"github.com/fahmialfareza/dzikir-app-api/helper"
 	"github.com/fahmialfareza/dzikir-app-api/repository"
 	"github.com/fahmialfareza/dzikir-app-api/service"
 	"github.com/gin-gonic/gin"
@@ -13,17 +14,23 @@ import (
 )
 
 var (
-	environment         *entity.Config                 = config.SetupEnvironment()
-	pool                *redis.Pool                    = config.NewPool(*environment)
+	environment *entity.Config = config.SetupEnvironment()
+	pool        *redis.Pool    = config.NewPool(*environment)
+
 	salatTimeRepository repository.SalatTimeRepository = repository.NewSalatRepository(environment)
 	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment, pool)
 	hijriRepository     repository.HijriRepository     = repository.NewHijriRepository(environment)
-	salatTimeService    service.SalatTimeService       = service.NewSalatTimeService(salatTimeRepository)
-	quranService        service.QuranService           = service.NewQuranService(quranRepository, pool)
-	hijriService        service.HijriService           = service.NewHijriService(hijriRepository)
+	geocodeRepository   repository.GeocodeRepository   = repository.NewGeocodeRepository(environment)
+
+	salatTimeService service.SalatTimeService = service.NewSalatTimeService(salatTimeRepository)
+	quranService     service.QuranService     = service.NewQuranService(quranRepository, pool)
+	hijriService     service.HijriService     = service.NewHijriService(hijriRepository)
+	geocodeService   service.GeocodeService   = service.NewGeocodeService(geocodeRepository)
+
 	salatTimeController controller.SalatTimeController = controller.NewSalatTimeController(salatTimeService)
 	quranController     controller.QuranController     = controller.NewQuranController(quranService)
 	hijriController     controller.HijriController     = controller.NewHijriController(hijriService)
+	geocodeController   controller.GeocodeController   = controller.NewGeocodeController(geocodeService)
 )
 
 func main() {
@@ -48,6 +55,21 @@ func main() {
 	{
 		hijriRoutes.GET("/:date/:month/:year", hijriController.GregorianToHijri)
 	}
+
+	geocodeRoutes := r.Group("/api/v1/geocode")
+	{
+		geocodeRoutes.GET("/reverse/:lat/:lng", geocodeController.ReverseGeocode)
+	}
+
+	r.NoRoute(func(context *gin.Context) {
+		res := helper.BuildErrorResponse("Not Found", "Resource not found", nil)
+		context.JSON(404, res)
+	})
+
+	r.NoMethod(func(context *gin.Context) {
+		res := helper.BuildErrorResponse("Method Not Allowed", "Method not allowed", nil)
+		context.JSON(405, res)
+	})
 
 	if os.Getenv("PORT") != "" {
 		// Heroku add a env variable called PORT, if exist we will use it

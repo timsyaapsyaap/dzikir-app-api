@@ -56,3 +56,7 @@ func monthIdHijri(month int) string {
 func gregorianToHijri(date int, month int, year int) string {
 	return fmt.Sprintf("/v1/gToH?date=%v-%v-%v", date, month, year)
 }
+
+func reverseGeocode(lat float64, lng float64) string {
+	return fmt.Sprintf(`/data/reverse-geocode-client?latitude=%v&longitude=%v`, lat, lng)
+}

@@ -29,25 +29,29 @@ func (controller *hijriController) GregorianToHijri(context *gin.Context) {
 
 	dateInt, err := strconv.Atoi(date)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Date is required", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	monthInt, err := strconv.Atoi(month)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Month is required", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	yearInt, err := strconv.Atoi(year)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Year is required", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	data, err := controller.hijriService.GregorianToHijri(dateInt, monthInt, yearInt)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 

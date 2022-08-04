@@ -27,7 +27,8 @@ func NewQuranController(quranService service.QuranService) QuranController {
 func (controller *quranController) AllChapters(context *gin.Context) {
 	data, err := controller.quranService.AllChapters()
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 
@@ -40,13 +41,15 @@ func (controller *quranController) VersesByChapter(context *gin.Context) {
 
 	chapterInt, err := strconv.Atoi(chapter)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Bad Request", "Chapter is required", nil)
+		context.JSON(400, res)
 		return
 	}
 
 	data, err := controller.quranService.VersesByChapter(chapterInt)
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 
@@ -57,7 +60,8 @@ func (controller *quranController) VersesByChapter(context *gin.Context) {
 func (controller *quranController) AllVerses(context *gin.Context) {
 	data, err := controller.quranService.AllVerses()
 	if err != nil {
-		helper.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+		res := helper.BuildErrorResponse("Internal Server Error", "Terjadi Kesalahan", nil)
+		context.JSON(500, res)
 		return
 	}
 

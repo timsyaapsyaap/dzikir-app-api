@@ -19,6 +19,9 @@ jobs:
       - run: echo "HIJRI_REST_API"=$HIJRI_REST_API >> .env
         env:
           HIJRI_REST_API: ${{ secrets.HIJRI_REST_API }}
+      - run: echo "GEOCODE_REST_API"=$GEOCODE_REST_API >> .env
+        env:
+          GEOCODE_REST_API: ${{ secrets.GEOCODE_REST_API }}
       - run: echo "REDIS_URL"=$REDIS_URL >> .env
         env:
           REDIS_URL: ${{ secrets.REDIS_URL_PRODUCTION }}
@@ -32,9 +35,11 @@ jobs:
             SALAT_TIME_REST_API
             QURAN_REST_API
             HIJRI_REST_API
+            GEOCODE_REST_API
             REDIS_URL
         env:
           SALAT_TIME_REST_API: ${{ secrets.SALAT_TIME_REST_API }}
           QURAN_REST_API: ${{ secrets.QURAN_REST_API }}
           HIJRI_REST_API: ${{ secrets.HIJRI_REST_API }}
+          GEOCODE_REST_API: ${{ secrets.GEOCODE_REST_API }}
           REDIS_URL: ${{ secrets.REDIS_URL_PRODUCTION }}
