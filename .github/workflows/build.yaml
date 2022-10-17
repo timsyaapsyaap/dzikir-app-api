@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} cloud.canister.io:5000
+      - run: echo "SALAT_TIME_REST_API"=$SALAT_TIME_REST_API > .env
+        env:
+          SALAT_TIME_REST_API: ${{ secrets.SALAT_TIME_REST_API }}
+      - run: echo "QURAN_REST_API"=$QURAN_REST_API >> .env
+        env:
+          QURAN_REST_API: ${{ secrets.QURAN_REST_API }}
+      - run: echo "HIJRI_REST_API"=$HIJRI_REST_API >> .env
+        env:
+          HIJRI_REST_API: ${{ secrets.HIJRI_REST_API }}
+      - run: echo "GEOCODE_REST_API"=$GEOCODE_REST_API >> .env
+        env:
+          GEOCODE_REST_API: ${{ secrets.GEOCODE_REST_API }}
+      - run: echo "REDIS_URL"=$REDIS_URL >> .env
+        env:
+          REDIS_URL: ${{ secrets.REDIS_URL_PRODUCTION }}
+      - name: Build
+        run: docker build --build-arg port=3000 -t cloud.canister.io:5000/fahmialfareza/dzikir-app-api .
+      - name: Push to registry
+        run: docker push cloud.canister.io:5000/fahmialfareza/dzikir-app-api
