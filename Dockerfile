@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine
+FROM golang:1.19-alpine
 
 ARG port
 
@@ -19,5 +19,3 @@ COPY . ./
 RUN go build .
 
 ENTRYPOINT [ "./dzikir-app-api" ]
-
-CMD ['./dzikir-app-api']
