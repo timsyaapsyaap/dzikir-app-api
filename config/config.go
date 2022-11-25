@@ -2,18 +2,23 @@ package config
 
 import (
 	"crypto/tls"
+	"log"
 	"os"
 
 	"github.com/fahmialfareza/dzikir-app-api/entity"
 	"github.com/gomodule/redigo/redis"
-	"github.com/subosito/gotenv"
+	"github.com/joho/godotenv"
 )
 
 // Setup environment variables
 func SetupEnvironment() *entity.Config {
-	err := gotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
+	env := os.Getenv("ENV")
+	if env != "production" {
+		// Get the config from .env file
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
 	}
 
 	// Set environment variables
