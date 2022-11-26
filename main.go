@@ -10,20 +10,20 @@ import (
 	"github.com/fahmialfareza/dzikir-app-api/repository"
 	"github.com/fahmialfareza/dzikir-app-api/service"
 	"github.com/gin-gonic/gin"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 var (
 	environment *entity.Config = config.SetupEnvironment()
-	pool        *redis.Pool    = config.NewPool(*environment)
+	redisClient *redis.Client  = config.NewRedisConn(environment)
 
-	salatTimeRepository repository.SalatTimeRepository = repository.NewSalatRepository(environment)
-	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment, pool)
-	hijriRepository     repository.HijriRepository     = repository.NewHijriRepository(environment)
-	geocodeRepository   repository.GeocodeRepository   = repository.NewGeocodeRepository(environment)
+	salatTimeRepository repository.SalatTimeRepository = repository.NewSalatRepository(environment, redisClient)
+	quranRepository     repository.QuranRepository     = repository.NewQuranRepository(environment, redisClient)
+	hijriRepository     repository.HijriRepository     = repository.NewHijriRepository(environment, redisClient)
+	geocodeRepository   repository.GeocodeRepository   = repository.NewGeocodeRepository(environment, redisClient)
 
 	salatTimeService service.SalatTimeService = service.NewSalatTimeService(salatTimeRepository)
-	quranService     service.QuranService     = service.NewQuranService(quranRepository, pool)
+	quranService     service.QuranService     = service.NewQuranService(quranRepository)
 	hijriService     service.HijriService     = service.NewHijriService(hijriRepository)
 	geocodeService   service.GeocodeService   = service.NewGeocodeService(geocodeRepository)
 

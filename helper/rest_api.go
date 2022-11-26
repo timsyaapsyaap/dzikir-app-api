@@ -1,15 +1,16 @@
 package helper
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 )
 
-func GetRequest(url string) ([]byte, error) {
+func GetRequest(ctx context.Context, url string) ([]byte, error) {
 	method := "GET"
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequestWithContext(ctx, method, url, nil)
 
 	if err != nil {
 		return nil, err

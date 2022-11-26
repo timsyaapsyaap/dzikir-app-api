@@ -1,6 +1,9 @@
 package repository
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	findCityAddress = "/v1/sholat/kota/cari/"
@@ -8,6 +11,18 @@ const (
 	allCities       = "/v1/sholat/kota/semua"
 
 	allChapters = "/api/v4/chapters?language=id"
+
+	allCitiesKey        = "cities:all"
+	findCityDetailsKey  = "cities:%s"
+	scheduleKey         = "schedule:%d:%d:%d:%d"
+	gregorianToHijriKey = "gregorian:%d:%d:%d"
+	geocodeKey          = "geocode:%f:%f"
+	verseKey            = "verses:%d"
+	allChaptersKey      = "chapters:all"
+	chapterKey          = "chapters:%d"
+
+	redisExpiration      = time.Hour * 24
+	redisQuranExpiration = time.Hour * 24 * 7
 )
 
 func schedule(cityId int, year int, month int, date int) string {

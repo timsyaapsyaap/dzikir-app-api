@@ -1,12 +1,11 @@
 package config
 
 import (
-	"crypto/tls"
 	"log"
 	"os"
 
 	"github.com/fahmialfareza/dzikir-app-api/entity"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 )
 
@@ -38,18 +37,12 @@ func SetupEnvironment() *entity.Config {
 }
 
 // Redis
-func NewPool(config entity.Config) *redis.Pool {
-	url := config.RedisURL
-
-	return &redis.Pool{
-		MaxIdle:   80,
-		MaxActive: 12000,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(url, redis.DialTLSSkipVerify(true), redis.DialTLSConfig(&tls.Config{InsecureSkipVerify: true}))
-			if err != nil {
-				panic(err.Error())
-			}
-			return c, err
-		},
+func NewRedisConn(config *entity.Config) *redis.Client {
+	opt, err := redis.ParseURL(config.RedisURL)
+	if err != nil {
+		panic(err)
 	}
+	rdb := redis.NewClient(opt)
+
+	return rdb
 }
